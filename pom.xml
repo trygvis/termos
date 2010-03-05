@@ -2,13 +2,16 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>no.hackaton.termos</groupId>
   <artifactId>termos</artifactId>
+  <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
+  <modules>
+    <module>termos-core</module>
+    <module>termos-examples</module>
+    <module>termos-extras</module>
+    <module>termos-mina-sshd</module>
+    <module>termos-extras</module>
+  </modules>
   <dependencies>
-    <dependency>
-      <groupId>org.apache.sshd</groupId>
-      <artifactId>sshd-core</artifactId>
-      <version>${version.sshd}</version>
-    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
