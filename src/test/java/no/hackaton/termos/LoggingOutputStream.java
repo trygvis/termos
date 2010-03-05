@@ -41,7 +41,7 @@ public class LoggingOutputStream extends OutputStream {
     }
 
     private byte[] dump(byte[] bytes) {
-        System.out.println(bytes.length + " bytes: " + join(bytes));
+        System.out.println("OUT: " + bytes.length + " bytes: " + join(bytes));
         return bytes;
     }
 }

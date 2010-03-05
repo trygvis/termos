@@ -159,7 +159,7 @@ public class ReadLine implements Closeable {
                     }
                     position = position - i;
                 }
-            } else if (b == TAB && tabCount++ == 1) {
+            } else if (b == TAB) {
                 // -----------------------------------------------------------------------
                 // Tab completion
                 // -----------------------------------------------------------------------
@@ -170,14 +170,15 @@ public class ReadLine implements Closeable {
                 // matches as far as possible.
                 // -----------------------------------------------------------------------
 
-                tabCount = 0;
-
                 String currentLine = charsToString();
 
                 List<String> options = completer.complete(currentLine);
 
                 outputStream.write('\r');
+                System.out.println("options.size() = " + options.size());
                 if (options.size() == 1) {
+                    tabCount = 0;
+                    outputStream.write('\r');
                     String match = options.get(0);
                     int length = match.length();
                     chars = new ArrayList<Character>(length);
@@ -187,23 +188,33 @@ public class ReadLine implements Closeable {
                     // Add an extra space after the match to be ready to write arguments to the command
                     chars.add(' ');
                 } else {
-                    outputStream.write('\n');
-
                     String s = findLongestMatch(currentLine, options);
-                    for(int i = currentLine.length(); i < s.length(); i++) {
+
+                    System.out.println("Longest match = " + s + ", length=" + s.length() + ", current line length=" + currentLine.length() + ", tabCount=" + tabCount);
+
+                    for (int i = currentLine.length(); i < s.length(); i++) {
                         chars.add(s.charAt(i));
                     }
 
-                    TreeSet<String> sortedOptions = new TreeSet<String>(options);
+                    // If we're at the longest common sub string, require tabCount to be 2 to write out all the hits
+                    if (s.length() == currentLine.length()) {
+                        if (tabCount == 1) {
+                            outputStream.write('\n');
+                            TreeSet<String> sortedOptions = new TreeSet<String>(options);
 
-                    for (String option : sortedOptions) {
-                        println(" " + option);
+                            for (String option : sortedOptions) {
+                                println(" " + option);
+                            }
+                        } else {
+                            tabCount++;
+                        }
                     }
                 }
                 print(prompt + charsToString());
                 position = positionAtToEndOfLine();
             } else if (b == ETX) {
                 tabCount = 0;
+                position = 0;
                 chars = new ArrayList<Character>();
                 println("");
                 print(prompt);
@@ -218,13 +229,13 @@ public class ReadLine implements Closeable {
     public static String findLongestMatch(String currentLine, List<String> options) {
         String s = options.get(0);
 
-        for(int i = currentLine.length(); i < s.length(); i++) {
+        for (int i = currentLine.length(); i < s.length(); i++) {
             char c = s.charAt(i);
 
             for (int j = 1, optionsSize = options.size(); j < optionsSize; j++) {
                 String t = options.get(j);
 
-                if(t.length() == i) {
+                if (t.length() == i) {
                     return t;
                 }
 
