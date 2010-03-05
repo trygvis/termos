@@ -1,7 +1,6 @@
 package no.hackaton.termos.extra;
 
 import no.hackaton.termos.*;
-import static no.hackaton.termos.ReadlineUtil.*;
 
 import java.io.*;
 import java.util.*;
@@ -10,57 +9,23 @@ import java.util.*;
  * @author <a href="mailto:trygvis@java.no">Trygve Laugst&oslash;l</a>
  * @version $Id$
  */
-public class CliRunner implements Runnable, Closeable {
+public class Repl {
 
-    private final InputStream stdin;
-    private final OutputStream stdout;
-    private final LineOutput stdoutP;
-    private final LineOutput stderrP;
-    private final Thread thread;
-    private final ReadLineEnvironment environment;
-    private final Map<String, CliCommand> commands;
-
-    public CliRunner(InputStream stdin, OutputStream stdout, OutputStream stderr,
-                     ReadLineEnvironment environment, Map<String, CliCommand> commands) {
-        this.stdin = stdin;
-        this.stdout = stdout;
-        this.environment = environment;
-        this.commands = commands;
-
-        stdoutP = new LineOutput(stdout);
-        stderrP = new LineOutput(stderr);
-
-        thread = new Thread(this, "ssh cli");
-        thread.setDaemon(true);
+    public static int repl(InputStream stdin, OutputStream stdout, OutputStream stderr,
+                           ReadLineEnvironment environment, Map<String, CliCommand> commands) throws IOException {
+        return repl(stdin, stdout, stderr, environment, commands, "");
     }
 
-    public void start() {
-        thread.start();
-    }
-
-    public void close() throws IOException {
-        System.out.println("CliRunner.close");
-        closeSilently(stdin);
-        closeSilently(stdoutP);
-        closeSilently(stderrP);
-    }
-
-    public void run() {
-        try {
-            doRun();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private int doRun() throws IOException {
+    public static int repl(InputStream stdin, OutputStream stdout, OutputStream stderr,
+                           ReadLineEnvironment environment, Map<String, CliCommand> commands, String prompt)
+            throws IOException {
         String line;
 
         while (true) {
             ReadLine readLine = new ReadLine(stdin, stdout, environment);
 
             readLine.sendPrompt("Awesome!");
-            line = readLine.readLine("READY> ", new CommandCompleter(commands.keySet()));
+            line = readLine.readLine(prompt, new CommandCompleter(commands.keySet()));
 
             if (line == null) {
                 break;
@@ -68,14 +33,15 @@ public class CliRunner implements Runnable, Closeable {
 
             line = line.trim();
 
-            System.out.println("line = " + line);
-
             if ("".equals(line)) {
                 continue;
             }
 
+            // TODO: Make this customizable, have a callback to be called so that the one starting the Repl
+            // can determine if we should stop or not.
             if ("exit".equals(line)) {
                 readLine.println("Later!");
+                readLine.flush();
                 break;
             }
 
@@ -89,13 +55,20 @@ public class CliRunner implements Runnable, Closeable {
 
             String[] realArgs = new String[args.length - 1];
             System.arraycopy(args, 0, realArgs, 0, realArgs.length);
-            command.run(stdoutP, realArgs);
+            command.run(stdin,
+                    new TerminalOutputStream(stdout, environment.ocrnl),
+                    new TerminalOutputStream(stderr, environment.ocrnl),
+                    environment,
+                    realArgs);
+
+            // TODO: Consider closing the TerminalOutputStream() here to make sure it's not kept and used in a
+            // random thread later on. Or not, it's quite far fetched. - trygve
         }
 
         return 10;
     }
 
-    private class CommandCompleter implements Completer {
+    private static class CommandCompleter implements Completer {
         private final Set<String> commands;
 
         public CommandCompleter(Set<String> commands) {

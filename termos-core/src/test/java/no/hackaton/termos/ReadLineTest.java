@@ -2,6 +2,7 @@ package no.hackaton.termos;
 
 import static no.hackaton.termos.NoCompleter.*;
 import static no.hackaton.termos.ReadLine.*;
+import static no.hackaton.termos.ReadLineEnvironment.*;
 import static no.hackaton.termos.ReadlineUtil.*;
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -68,7 +69,7 @@ public class ReadLineTest {
     public void testBackwardWord() throws Exception {
         testMachine().
                 i("Hello World!").o("Hello World!").
-                i(ESC, (byte)'b').o(ReadlineUtil.repeat(cursorLf, 7)).
+                i(ESC, (byte) 'b').o(ReadlineUtil.repeat(cursorLf, 7)).
                 check("Hello World!", 7);
     }
 
@@ -118,7 +119,7 @@ public class ReadLineTest {
     static class ReadLineMachineTester {
         private ByteArrayOutputStream inputCollector = new ByteArrayOutputStream(1024);
         private ByteArrayOutputStream expectedOutput = new ByteArrayOutputStream(1024);
-        private ReadLineEnvironment environment = new ReadLineEnvironment(null, null);
+        private ReadLineEnvironment environment = defaultEnvironment;
         private String prompt;
         private Completer completer;
 

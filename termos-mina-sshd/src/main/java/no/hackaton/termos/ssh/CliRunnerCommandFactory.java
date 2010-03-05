@@ -1,6 +1,7 @@
 package no.hackaton.termos.ssh;
 
 import no.hackaton.termos.*;
+import static no.hackaton.termos.ReadlineUtil.*;
 import no.hackaton.termos.extra.*;
 import org.apache.sshd.common.*;
 import org.apache.sshd.server.*;
@@ -9,9 +10,9 @@ import java.io.*;
 import java.util.*;
 
 /**
-* @author <a href="mailto:trygvis@java.no">Trygve Laugst&oslash;l</a>
-* @version $Id$
-*/
+ * @author <a href="mailto:trygvis@java.no">Trygve Laugst&oslash;l</a>
+ * @version $Id$
+ */
 public class CliRunnerCommandFactory implements Factory<Command> {
     private final Map<String, CliCommand> commands;
 
@@ -25,7 +26,7 @@ public class CliRunnerCommandFactory implements Factory<Command> {
             private OutputStream stdout;
             private OutputStream stderr;
             private ExitCallback exitCallback;
-            private CliRunner cliRunner;
+            private ReplThread repl;
 
             public void setInputStream(InputStream stdin) {
                 this.stdin = stdin;
@@ -44,16 +45,35 @@ public class CliRunnerCommandFactory implements Factory<Command> {
             }
 
             public void start(Environment e) throws IOException {
-                String encoding = null;
-                Integer erase = e.getPtyModes().get(PtyMode.VERASE);
-                ReadLineEnvironment environment = new ReadLineEnvironment(encoding, erase);
-                cliRunner = new CliRunner(stdin, stdout, stderr, environment, commands);
-                cliRunner.start();
+                repl = new ReplThread(stdin, stdout, stderr, toReadLineEnvironment(e), commands, new Runnable() {
+                    public void run() {
+                        exitCallback.onExit(0);
+                    }
+                });
+                repl.start();
             }
 
             public void destroy() {
-                ReadlineUtil.closeSilently(cliRunner);
+                closeSilently(repl);
             }
         };
+    }
+
+    public static boolean getBoolean(Map<PtyMode, Integer> map, PtyMode mode) {
+        Integer i = map.get(mode);
+
+        return i != null && i == 1;
+    }
+
+    public static ReadLineEnvironment toReadLineEnvironment(Environment environment) {
+        Map<PtyMode, Integer> map = environment.getPtyModes();
+//        for (Entry<PtyMode, Integer> entry : map.entrySet()) {
+//            System.out.println(entry.getKey() + "=" + entry.getValue());
+//        }
+        String encoding = null;
+        Integer erase = map.get(PtyMode.VERASE);
+
+        return new ReadLineEnvironment(encoding, erase,
+                getBoolean(map, PtyMode.ICRNL), getBoolean(map, PtyMode.OCRNL));
     }
 }

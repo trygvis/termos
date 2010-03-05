@@ -1,5 +1,7 @@
 package no.hackaton.termos.extra;
 
+import no.hackaton.termos.*;
+
 import java.io.*;
 
 /**
@@ -9,5 +11,5 @@ import java.io.*;
 public interface CliCommand {
     String getId();
 
-    void run(LineOutput output, String[] args) throws IOException;
+    void run(InputStream stdin, OutputStream stdout, OutputStream stderr, ReadLineEnvironment environment, String[] args) throws IOException;
 }

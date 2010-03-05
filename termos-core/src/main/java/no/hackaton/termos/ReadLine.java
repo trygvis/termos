@@ -4,7 +4,6 @@ import static java.lang.Character.*;
 import static java.lang.Character.valueOf;
 import static java.lang.Integer.*;
 import static no.hackaton.termos.NoCompleter.*;
-import static no.hackaton.termos.ReadlineUtil.closeSilently;
 
 import java.io.*;
 import java.util.*;
@@ -19,7 +18,7 @@ import java.util.*;
  * @version $Id$
  */
 @SuppressWarnings({"OctalInteger"})
-public class ReadLine implements Closeable {
+public class ReadLine {
     public static final byte ETX = 003; // Ctrl-c
     public static final byte BS = 010;
     public static final byte TAB = 011;
@@ -76,7 +75,7 @@ public class ReadLine implements Closeable {
         int tabCount = 0;
 
         print(prompt);
-        outputStream.flush();
+        flush();
 
         // TODO: This should read all available bytes
 
@@ -89,7 +88,7 @@ public class ReadLine implements Closeable {
 
             if (0x20 <= b && b < 0x7f) {
                 outputStream.write(b);
-                outputStream.flush();
+                flush();
 
                 if (isEndOfLine()) {
                     chars.add((char) b);
@@ -103,7 +102,7 @@ public class ReadLine implements Closeable {
                 // This seems to be correct, at least if ONLCR=1
                 outputStream.write('\r');
                 outputStream.write('\n');
-                outputStream.flush();
+                flush();
                 break;
             }
 
@@ -226,7 +225,7 @@ public class ReadLine implements Closeable {
                 println("");
                 print(prompt);
             }
-            outputStream.flush();
+            flush();
         } while (true);
 
         // TODO: Decode
@@ -289,10 +288,6 @@ public class ReadLine implements Closeable {
         return b;
     }
 
-    public void close() throws IOException {
-        closeSilently(inputStream);
-    }
-
     public static int findStartOfWord(List<Character> chars, int position) {
 //        int i = position;
         return 0;
@@ -340,6 +335,10 @@ public class ReadLine implements Closeable {
         outputStream.write(toBytes("]0;")); // TODO: This should be a byte array
         outputStream.write(toBytes(s));
         outputStream.write(BEL);
+        flush();
+    }
+
+    public void flush() throws IOException {
         outputStream.flush();
     }
 }
