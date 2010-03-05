@@ -1,0 +1,17 @@
+*~
+catalog.xml
+.classpath
+hostkey.ser
+.idea
+*.iml
+*.ipr
+*.iws
+*.log
+nbactions.xml
+nbproject
+private
+profiles.xml
+.project
+.settings
+.svn
+target
