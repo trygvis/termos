@@ -7,6 +7,7 @@ import static org.junit.Assert.*;
 import org.junit.*;
 
 import java.io.*;
+import java.util.*;
 
 /**
  * @author <a href="mailto:trygvis@java.no">Trygve Laugst&oslash;l</a>
@@ -86,6 +87,22 @@ public class ReadLineTest {
         assertEquals(7, findEndOfWord(ReadlineUtil.asList("foo bar"), 3));
     }
 
+    // -----------------------------------------------------------------------
+    //
+    // -----------------------------------------------------------------------
+
+    @Test
+    public void testFindLongestMatch() {
+        assertEquals("ab", findLongestMatch("a", Arrays.asList("abc", "abd")));
+        assertEquals("a", findLongestMatch("a", Arrays.asList("a", "abc")));
+        assertEquals("a", findLongestMatch("a", Arrays.asList("a", "b")));
+        assertEquals("abc", findLongestMatch("abc", Arrays.asList("abcX", "abcY")));
+    }
+
+    // -----------------------------------------------------------------------
+    //
+    // -----------------------------------------------------------------------
+
     public static ReadLineMachineTester testMachine() {
         return testMachine("");
     }
@@ -155,8 +172,7 @@ public class ReadLineTest {
 
             assertEquals("Position", position, readLine.getPosition());
 
-//            assertArrayEquals("Bytes", expectedOutput.toByteArray(), outputCollector.toByteArray());
-            Assert.assertEquals("Bytes", ReadlineUtil.join(expectedOutput.toByteArray()), ReadlineUtil.join(outputCollector.toByteArray()));
+            Assert.assertEquals("Bytes written", ReadlineUtil.join(expectedOutput.toByteArray()), ReadlineUtil.join(outputCollector.toByteArray()));
 
             return this;
         }

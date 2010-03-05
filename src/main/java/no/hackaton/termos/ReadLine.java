@@ -160,6 +160,16 @@ public class ReadLine implements Closeable {
                     position = position - i;
                 }
             } else if (b == TAB && tabCount++ == 1) {
+                // -----------------------------------------------------------------------
+                // Tab completion
+                // -----------------------------------------------------------------------
+
+                // -----------------------------------------------------------------------
+                // TODO: Right now it requires TAB to be hit twice before completion is
+                // shown. However, it should only require a single tab to complete any
+                // matches as far as possible.
+                // -----------------------------------------------------------------------
+
                 tabCount = 0;
 
                 String currentLine = charsToString();
@@ -179,16 +189,23 @@ public class ReadLine implements Closeable {
                 } else {
                     outputStream.write('\n');
 
-                    println("Got " + options.size() + " matches:");
-                    for (String option : options) {
-                        println(option);
+                    String s = findLongestMatch(currentLine, options);
+                    for(int i = currentLine.length(); i < s.length(); i++) {
+                        chars.add(s.charAt(i));
+                    }
+
+                    TreeSet<String> sortedOptions = new TreeSet<String>(options);
+
+                    for (String option : sortedOptions) {
+                        println(" " + option);
                     }
                 }
                 print(prompt + charsToString());
+                position = positionAtToEndOfLine();
             } else if (b == ETX) {
                 tabCount = 0;
-                println("");
                 chars = new ArrayList<Character>();
+                println("");
                 print(prompt);
             }
             outputStream.flush();
@@ -196,6 +213,32 @@ public class ReadLine implements Closeable {
 
         // TODO: Decode
         return charsToString();
+    }
+
+    public static String findLongestMatch(String currentLine, List<String> options) {
+        String s = options.get(0);
+
+        for(int i = currentLine.length(); i < s.length(); i++) {
+            char c = s.charAt(i);
+
+            for (int j = 1, optionsSize = options.size(); j < optionsSize; j++) {
+                String t = options.get(j);
+
+                if(t.length() == i) {
+                    return t;
+                }
+
+                if (c != t.charAt(i)) {
+                    return t.substring(0, i);
+                }
+            }
+        }
+
+        return s;
+    }
+
+    private int positionAtToEndOfLine() {
+        return chars.size();
     }
 
     private String charsToString() {

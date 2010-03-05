@@ -1,6 +1,6 @@
 package no.hackaton.termos;
 
-import static no.hackaton.termos.ReadlineUtil.closeSilently;
+import static no.hackaton.termos.ReadlineUtil.*;
 import no.hackaton.termos.commands.*;
 import org.apache.sshd.*;
 import org.apache.sshd.common.*;
@@ -32,11 +32,19 @@ public class SshTestServer {
     private void work() throws IOException {
         addCommand(new SillyCommand("aaaaaa"));
         addCommand(new SillyCommand("aaaaab"));
+
         addCommand(new SillyCommand("bbbbbb"));
         addCommand(new SillyCommand("bbcccc"));
+
         addCommand(new SillyCommand("cccccc"));
         addCommand(new SillyCommand("ccdddd"));
         addCommand(new SillyCommand("ccddee"));
+
+        addCommand(new SillyCommand("dddddd"));
+
+//        commands.clear();
+//        addCommand(new SillyCommand("abcX"));
+//        addCommand(new SillyCommand("abcY"));
 
         // -----------------------------------------------------------------------
         //
