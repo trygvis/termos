@@ -1,6 +1,6 @@
 package no.hackaton.termos.example.ssh;
 
-import no.hackaton.termos.commands.*;
+import no.hackaton.termos.example.commands.*;
 import no.hackaton.termos.extra.*;
 import no.hackaton.termos.ssh.*;
 import org.apache.sshd.*;
@@ -42,9 +42,9 @@ public class SshTestServer {
 
         addCommand(new SillyCommand("dddddd"));
 
-//        commands.clear();
-//        addCommand(new SillyCommand("abcX"));
-//        addCommand(new SillyCommand("abcY"));
+        commands.clear();
+        addCommand(new SillyCommand("abcX"));
+        addCommand(new SillyCommand("abcY"));
 
         // -----------------------------------------------------------------------
         //

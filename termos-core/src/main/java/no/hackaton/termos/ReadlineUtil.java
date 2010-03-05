@@ -10,6 +10,43 @@ import java.util.*;
  * @version $Id$
  */
 public class ReadlineUtil {
+    public static interface F<A, B> {
+        B f(A a);
+    }
+
+    public static class PrettyF implements F<Byte, String> {
+        public String f(Byte b) {
+            if (b < 0x20) {
+                return toHexString(b);
+            } else if (b <= 0x7e) {
+                return "'" + Character.toString((char) b.byteValue()) + "'";
+            } else {
+                return "0x" + toHexString(b);
+            }
+        }
+    }
+
+    public static String joinPretty(byte[] bytes) {
+        F<Byte, String> f = new PrettyF();
+
+        StringBuffer buffer = new StringBuffer(bytes.length * 2);
+
+        if (bytes.length == 0) {
+            return "";
+        }
+
+        buffer.append(f.f(bytes[0]));
+
+        int bytesLength = bytes.length;
+
+        for (int i = 1; i < bytesLength; i++) {
+            byte b = bytes[i];
+            buffer.append(", ").append(f.f(b));
+        }
+
+        return buffer.toString();
+    }
+
     public static String join(byte[] bytes) {
         if (bytes.length == 0) {
             return "";

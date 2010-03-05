@@ -1,9 +1,10 @@
 package no.hackaton.termos;
 
-import static no.hackaton.termos.NoCompleter.noCompleter;
+import static no.hackaton.termos.NoCompleter.*;
 import static no.hackaton.termos.ReadLine.*;
-import static org.junit.Assert.*;
+import static no.hackaton.termos.ReadlineUtil.*;
 import org.junit.*;
+import static org.junit.Assert.*;
 
 import java.io.*;
 import java.util.*;
@@ -171,7 +172,8 @@ public class ReadLineTest {
 
             assertEquals("Position", position, readLine.getPosition());
 
-            Assert.assertEquals("Bytes written", ReadlineUtil.join(expectedOutput.toByteArray()), ReadlineUtil.join(outputCollector.toByteArray()));
+//            Assert.assertEquals("Bytes written", join(expectedOutput.toByteArray()), join(outputCollector.toByteArray()));
+            Assert.assertEquals("Bytes written", joinPretty(expectedOutput.toByteArray()), joinPretty(outputCollector.toByteArray()));
 
             return this;
         }

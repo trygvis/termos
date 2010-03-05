@@ -15,7 +15,6 @@ public class CliRunner implements Runnable, Closeable {
     private final InputStream stdin;
     private final OutputStream stdout;
     private final LineOutput stdoutP;
-//    private final OutputStream stderr;
     private final LineOutput stderrP;
     private final Thread thread;
     private final ReadLineEnvironment environment;

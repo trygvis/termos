@@ -172,43 +172,52 @@ public class ReadLine implements Closeable {
 
                 List<String> options = completer.complete(currentLine);
 
-                outputStream.write('\r');
-                System.out.println("options.size() = " + options.size());
-                if (options.size() == 1) {
+                if (options.size() == 0) {
+                    // Do nothing
+                }
+                else if (options.size() == 1) {
                     tabCount = 0;
-                    outputStream.write('\r');
                     String match = options.get(0);
                     int length = match.length();
-                    chars = new ArrayList<Character>(length);
-                    for (int i = 0; i < length; i++) {
-                        chars.add(match.charAt(i));
+
+                    // TODO: This should probably *insert* characters instead of *adding* as completion might
+                    // happen in the middle of a string
+                    for (int i = currentLine.length(); i < length; i++) {
+                        char c = match.charAt(i);
+                        chars.add(c);
+                        outputStream.write(c);
                     }
                     // Add an extra space after the match to be ready to write arguments to the command
                     chars.add(' ');
+                    outputStream.write(' ');
                 } else {
                     String s = findLongestMatch(currentLine, options);
 
                     System.out.println("Longest match = " + s + ", length=" + s.length() + ", current line length=" + currentLine.length() + ", tabCount=" + tabCount);
 
                     for (int i = currentLine.length(); i < s.length(); i++) {
-                        chars.add(s.charAt(i));
+                        char c = s.charAt(i);
+                        chars.add(c);
+                        outputStream.write(c);
                     }
 
                     // If we're at the longest common sub string, require tabCount to be 2 to write out all the hits
                     if (s.length() == currentLine.length()) {
                         if (tabCount == 1) {
+                            outputStream.write('\r');
                             outputStream.write('\n');
                             TreeSet<String> sortedOptions = new TreeSet<String>(options);
 
+                            // TODO: Format the options in a prettier way
                             for (String option : sortedOptions) {
-                                println(" " + option);
+                                println(option);
                             }
+                            print(prompt + charsToString());
                         } else {
                             tabCount++;
                         }
                     }
                 }
-                print(prompt + charsToString());
                 position = positionAtToEndOfLine();
             } else if (b == ETX) {
                 tabCount = 0;
