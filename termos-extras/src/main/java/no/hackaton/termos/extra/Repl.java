@@ -54,12 +54,16 @@ public class Repl {
             }
 
             String[] realArgs = new String[args.length - 1];
-            System.arraycopy(args, 0, realArgs, 0, realArgs.length);
-            command.run(stdin,
-                    new TerminalOutputStream(stdout, environment.ocrnl),
-                    new TerminalOutputStream(stderr, environment.ocrnl),
-                    environment,
-                    realArgs);
+            System.arraycopy(args, 1, realArgs, 0, realArgs.length);
+            try {
+                command.run(stdin,
+                        new TerminalOutputStream(stdout, environment.ocrnl),
+                        new TerminalOutputStream(stderr, environment.ocrnl),
+                        environment,
+                        realArgs);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             // TODO: Consider closing the TerminalOutputStream() here to make sure it's not kept and used in a
             // random thread later on. Or not, it's quite far fetched. - trygve

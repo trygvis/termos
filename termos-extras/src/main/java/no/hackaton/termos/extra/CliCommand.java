@@ -11,5 +11,5 @@ import java.io.*;
 public interface CliCommand {
     String getId();
 
-    void run(InputStream stdin, OutputStream stdout, OutputStream stderr, ReadLineEnvironment environment, String[] args) throws IOException;
+    void run(InputStream stdin, OutputStream stdout, OutputStream stderr, ReadLineEnvironment environment, String[] args) throws Exception;
 }

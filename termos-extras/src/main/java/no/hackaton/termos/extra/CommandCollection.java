@@ -14,4 +14,12 @@ public class CommandCollection {
         _commands.put(command.getId(), command);
         return this;
     }
+
+    public CommandCollection addCommand(CliCommand command, String ... aliases) {
+        _commands.put(command.getId(), command);
+        for (String alias : aliases) {
+            _commands.put(alias, command);
+        }
+        return this;
+    }
 }

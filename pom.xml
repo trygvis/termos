@@ -9,7 +9,6 @@
     <module>termos-examples</module>
     <module>termos-extras</module>
     <module>termos-mina-sshd</module>
-    <module>termos-extras</module>
   </modules>
   <dependencies>
     <dependency>
