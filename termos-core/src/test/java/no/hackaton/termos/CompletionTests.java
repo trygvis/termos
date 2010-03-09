@@ -2,7 +2,7 @@ package no.hackaton.termos;
 
 import static no.hackaton.termos.ReadLine.*;
 import static no.hackaton.termos.ReadLineTest.*;
-import org.junit.Test;
+import org.junit.*;
 
 import java.io.*;
 import java.util.*;
@@ -37,22 +37,14 @@ public class CompletionTests {
     }
 
     public static class StringListCompleter implements Completer {
-        String[] strings;
+        Collection<String> strings;
 
         public StringListCompleter(String... strings) {
-            this.strings = strings;
+            this.strings = Arrays.asList(strings);
         }
 
-        public List<String> complete(String string) {
-            List<String> candidates = new ArrayList<String>();
-
-            for (String s : strings) {
-                if (s.startsWith(string)) {
-                    candidates.add(s);
-                }
-            }
-
-            return candidates;
+        public List<String> complete(String string, int position) {
+            return CompletionUtil.completeStrings(strings, string);
         }
     }
 }

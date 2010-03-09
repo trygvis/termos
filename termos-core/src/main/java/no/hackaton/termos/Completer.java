@@ -7,5 +7,5 @@ import java.util.*;
  * @version $Id$
  */
 public interface Completer {
-    List<String> complete(String string);
+    List<String> complete(String currentLine, int position);
 }

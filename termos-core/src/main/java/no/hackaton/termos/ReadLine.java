@@ -169,7 +169,41 @@ public class ReadLine {
 
                 String currentLine = charsToString();
 
-                List<String> options = completer.complete(currentLine);
+                // TODO: This probably assumes too much about how a program wants to completeStrings something.
+                // It's probably best to pass all the parameters to the completer and have it return a bigger object.
+                // In: current line, cursor position, out: options
+
+                int wordStart = currentLine.lastIndexOf(' ', position);
+                if(wordStart == -1) {
+                    wordStart = 0;
+                }
+                else {
+                    wordStart += 1;
+                }
+
+                System.out.println("ReadLine.doRead");
+                System.out.println("currentLine = '" + currentLine + "', wordStart=" + wordStart + ", position=" + position);
+                List<String> options = completer.complete(currentLine, position);
+                System.out.println("options:");
+                System.out.println(options);
+
+                String s = findLongestMatch(0, options);
+                System.out.println("Longest match = " + s + ", (position - wordStart)=" + (position - wordStart));
+
+/*
+foo bar
+    ^       word start
+      ^     position
+
+completion="barbara"
+ */
+                int wordPosition = position - wordStart;
+
+                for(int i = wordPosition; i < s.length(); i++) {
+                    char c = s.charAt(i);
+                    chars.add(c);
+                    outputStream.write(c);
+                }
 
                 if (options.size() == 0) {
                     // Do nothing
@@ -181,27 +215,25 @@ public class ReadLine {
 
                     // TODO: This should probably *insert* characters instead of *adding* as completion might
                     // happen in the middle of a string
-                    for (int i = currentLine.length(); i < length; i++) {
-                        char c = match.charAt(i);
-                        chars.add(c);
-                        outputStream.write(c);
-                    }
+//                    for (int i = currentLine.length(); i < length; i++) {
+//                        char c = match.charAt(i);
+//                        chars.add(c);
+//                        outputStream.write(c);
+//                    }
                     // Add an extra space after the match to be ready to write arguments to the command
                     chars.add(' ');
                     outputStream.write(' ');
                 } else {
-                    String s = findLongestMatch(currentLine, options);
 
-                    System.out.println("Longest match = " + s + ", length=" + s.length() + ", current line length=" + currentLine.length() + ", tabCount=" + tabCount);
+//                    for (int i = currentLine.length(); i < s.length(); i++) {
+//                        char c = s.charAt(i);
+//                        chars.add(c);
+//                        outputStream.write(c);
+//                    }
 
-                    for (int i = currentLine.length(); i < s.length(); i++) {
-                        char c = s.charAt(i);
-                        chars.add(c);
-                        outputStream.write(c);
-                    }
-
+                    System.out.println("s='" + s + "', currentLine.length()=" + currentLine.length() + ", tabCount = " + tabCount);
                     // If we're at the longest common sub string, require tabCount to be 2 to write out all the hits
-                    if (s.length() == currentLine.length()) {
+                    if (chars.size() == position) {
                         if (tabCount == 1) {
                             outputStream.write('\r');
                             outputStream.write('\n');
@@ -212,6 +244,7 @@ public class ReadLine {
                                 println(option);
                             }
                             print(prompt + charsToString());
+                            tabCount = 0;
                         } else {
                             tabCount++;
                         }
@@ -232,10 +265,15 @@ public class ReadLine {
         return charsToString();
     }
 
-    public static String findLongestMatch(String currentLine, List<String> options) {
+    /**
+     *
+     * @param start The character to start checking at
+     * @param options The list of strings to search in
+     */
+    public static String findLongestMatch(int start, List<String> options) {
         String s = options.get(0);
 
-        for (int i = currentLine.length(); i < s.length(); i++) {
+        for (int i = start; i < s.length(); i++) {
             char c = s.charAt(i);
 
             for (int j = 1, optionsSize = options.size(); j < optionsSize; j++) {

@@ -1,6 +1,8 @@
 package no.hackaton.termos.extra;
 
+import static java.util.Collections.*;
 import no.hackaton.termos.*;
+import static no.hackaton.termos.CompletionUtil.completeStrings;
 
 import java.io.*;
 import java.util.*;
@@ -18,14 +20,14 @@ public class Repl {
 
     public static int repl(InputStream stdin, OutputStream stdout, OutputStream stderr,
                            ReadLineEnvironment environment, Map<String, CliCommand> commands, String prompt)
-            throws IOException {
+        throws IOException {
         String line;
 
         while (true) {
             ReadLine readLine = new ReadLine(stdin, stdout, environment);
 
             readLine.sendPrompt("Awesome!");
-            line = readLine.readLine(prompt, new CommandCompleter(commands.keySet()));
+            line = readLine.readLine(prompt, new CommandCompleter(commands));
 
             if (line == null) {
                 break;
@@ -57,10 +59,10 @@ public class Repl {
             System.arraycopy(args, 1, realArgs, 0, realArgs.length);
             try {
                 command.run(stdin,
-                        new TerminalOutputStream(stdout, environment.ocrnl),
-                        new TerminalOutputStream(stderr, environment.ocrnl),
-                        environment,
-                        realArgs);
+                    new TerminalOutputStream(stdout, environment.ocrnl),
+                    new TerminalOutputStream(stderr, environment.ocrnl),
+                    environment,
+                    realArgs);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -72,23 +74,45 @@ public class Repl {
         return 10;
     }
 
-    private static class CommandCompleter implements Completer {
-        private final Set<String> commands;
+    public static class CommandCompleter implements Completer {
+        private final Map<String, CliCommand> commands;
 
-        public CommandCompleter(Set<String> commands) {
+        CommandCompleter(Map<String, CliCommand> commands) {
             this.commands = commands;
         }
 
-        public List<String> complete(String string) {
-            List<String> matches = new ArrayList<String>();
+        public List<String> complete(String string, int position) {
+            System.out.println("Repl$CommandCompleter.complete");
 
-            for (String s : commands) {
-                if(s.startsWith(string)) {
-                    matches.add(s);
-                }
+            int index = string.indexOf(' ');
+            System.out.println("index = " + index + ", position=" + position);
+
+            // Figure out if we're completing a command name or arguments to the command
+
+            if (index == -1 || index > position) {
+                return completeStrings(commands.keySet(), string);
+            } else {
+                return completeCommand(string, index);
+            }
+        }
+
+        private List<String> completeCommand(String string, int index) {
+            String commandName = string.substring(0, index).trim();
+
+            System.out.println("commandName = " + commandName);
+
+            CliCommand command = commands.get(commandName);
+            if (command == null) {
+                return emptyList();
             }
 
-            return matches;
+            if (!(command instanceof Completer)) {
+                return emptyList();
+            }
+
+            Completer completer = (Completer) command;
+
+            return completer.complete(string.substring(index + 1), 0);
         }
     }
 }

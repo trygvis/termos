@@ -1,18 +1,21 @@
 package no.hackaton.termos.example.commands.jmx;
 
+import no.hackaton.termos.*;
 import static no.hackaton.termos.extra.formatting.PageUtil.*;
 import no.hackaton.termos.extra.*;
 
 import javax.management.*;
 import java.io.*;
 import java.lang.management.*;
+import java.util.*;
 
 /**
  * @author <a href="mailto:trygvis@java.no">Trygve Laugst&oslash;l</a>
  * @version $Id$
  */
-public class JmxDescribeCommand extends SimplePrintingCliCommand {
+public class JmxDescribeCommand extends SimplePrintingCliCommand implements Completer {
     private final MBeanServer mBeanServer;
+    private final JmxUtil jmxUtil;
     private String[] columnTitles = new String[]{
         "Name",
         "Description",
@@ -23,6 +26,8 @@ public class JmxDescribeCommand extends SimplePrintingCliCommand {
 
     public JmxDescribeCommand() {
         this.mBeanServer = ManagementFactory.getPlatformMBeanServer();
+
+        jmxUtil = new JmxUtil(mBeanServer);
     }
 
     public String getId() {
@@ -52,5 +57,9 @@ public class JmxDescribeCommand extends SimplePrintingCliCommand {
         }
 
         showPage(columnTitles, data, writer);
+    }
+
+    public List<String> complete(String string, int position) {
+        return jmxUtil.complete(string, position);
     }
 }

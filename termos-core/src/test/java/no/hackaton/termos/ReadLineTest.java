@@ -94,10 +94,10 @@ public class ReadLineTest {
 
     @Test
     public void testFindLongestMatch() {
-        assertEquals("ab", findLongestMatch("a", Arrays.asList("abc", "abd")));
-        assertEquals("a", findLongestMatch("a", Arrays.asList("a", "abc")));
-        assertEquals("a", findLongestMatch("a", Arrays.asList("a", "b")));
-        assertEquals("abc", findLongestMatch("abc", Arrays.asList("abcX", "abcY")));
+        assertEquals("ab", findLongestMatch(1, Arrays.asList("abc", "abd")));
+        assertEquals("a", findLongestMatch(1, Arrays.asList("a", "abc")));
+        assertEquals("a", findLongestMatch(1, Arrays.asList("a", "b")));
+        assertEquals("abc", findLongestMatch(3, Arrays.asList("abcX", "abcY")));
     }
 
     // -----------------------------------------------------------------------

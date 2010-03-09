@@ -9,7 +9,7 @@ import java.util.*;
 public class NoCompleter implements Completer {
     public static final Completer noCompleter = new NoCompleter();
 
-    public List<String> complete(String string) {
+    public List<String> complete(String string, int position) {
         return Collections.singletonList(string);
     }
 }
