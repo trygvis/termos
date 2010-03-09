@@ -1,5 +1,6 @@
 package no.hackaton.termos.ssh;
 
+import static java.lang.Integer.*;
 import no.hackaton.termos.*;
 import static no.hackaton.termos.ReadlineUtil.*;
 import no.hackaton.termos.extra.*;
@@ -65,15 +66,43 @@ public class CliRunnerCommandFactory implements Factory<Command> {
         return i != null && i == 1;
     }
 
+    private static Integer getInteger(Map<String, String> env, String key) {
+        String s = env.get(key);
+
+        if (s == null) {
+            return null;
+        }
+
+        try {
+            return valueOf(s);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
     public static ReadLineEnvironment toReadLineEnvironment(Environment environment) {
-        Map<PtyMode, Integer> map = environment.getPtyModes();
-//        for (Entry<PtyMode, Integer> entry : map.entrySet()) {
+        final Map<String, String> env = environment.getEnv();
+        Map<PtyMode, Integer> ptyModes = environment.getPtyModes();
+//        for (Entry<PtyMode, Integer> entry : ptyModes.entrySet()) {
 //            System.out.println(entry.getKey() + "=" + entry.getValue());
 //        }
         String encoding = null;
-        Integer erase = map.get(PtyMode.VERASE);
+        Integer erase = ptyModes.get(PtyMode.VERASE);
 
-        return new ReadLineEnvironment(encoding, erase,
-                getBoolean(map, PtyMode.ICRNL), getBoolean(map, PtyMode.OCRNL));
+        final ReadLineEnvironment readLineEnvironment = new ReadLineEnvironment(encoding, erase,
+            getBoolean(ptyModes, PtyMode.ICRNL),
+            getBoolean(ptyModes, PtyMode.OCRNL),
+            getInteger(env, Environment.ENV_COLUMNS),
+            getInteger(env, Environment.ENV_LINES));
+
+        environment.addSignalListener(new SignalListener() {
+            public void signal(Signal signal) {
+                readLineEnvironment.onWindowChange(
+                    getInteger(env, Environment.ENV_COLUMNS),
+                    getInteger(env, Environment.ENV_LINES));
+            }
+        });
+
+        return readLineEnvironment;
     }
 }

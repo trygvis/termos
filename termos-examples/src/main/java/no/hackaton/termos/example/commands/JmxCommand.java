@@ -16,6 +16,7 @@ public class JmxCommand implements CliCommand {
     CommandCollection commands = new CommandCollection() {{
         addCommand(new HelpCommand(commands));
         addCommand(new JmxDescribeCommand());
+        addCommand(new JmxFollowCommand());
         addCommand(new JmxOsCommand());
         addCommand(new JmxListCommand(), "ls");
         addCommand(new JmxMemoryCommand());

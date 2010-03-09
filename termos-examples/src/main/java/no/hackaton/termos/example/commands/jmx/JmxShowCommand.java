@@ -30,7 +30,7 @@ public class JmxShowCommand extends SimplePrintingCliCommand implements Complete
     @Override
     public void run() throws Exception {
         if(args.length != 1) {
-            error.println("Usage: describe <object name>");
+            error.println("Usage: show <object name>");
             return;
         }
 
