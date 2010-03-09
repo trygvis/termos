@@ -1,9 +1,7 @@
 package no.hackaton.termos.example.commands.jmx;
 
-import no.hackaton.termos.*;
 import no.hackaton.termos.extra.*;
 
-import java.io.*;
 import java.lang.management.*;
 
 /**
@@ -22,7 +20,7 @@ public class JmxOsCommand extends SimplePrintingCliCommand {
     }
 
     @Override
-    public void runWithPrinter(PrintWriter writer) {
+    public void run() {
         writer.println("Operating system");
         writer.println(" Name:         " + os.getName());
         writer.println(" Arch:         " + os.getArch());

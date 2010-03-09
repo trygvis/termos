@@ -4,7 +4,6 @@ import static java.lang.Runtime.*;
 import static no.hackaton.termos.example.TermosUtil.*;
 import no.hackaton.termos.extra.*;
 
-import java.io.*;
 import java.lang.management.*;
 
 /**
@@ -24,7 +23,7 @@ public class JmxRunGcCommand extends SimplePrintingCliCommand {
     }
 
     @Override
-    public void runWithPrinter(PrintWriter writer) {
+    public void run() {
         writer.print("Running garbage collection...");
 
         long before = runtime.freeMemory();

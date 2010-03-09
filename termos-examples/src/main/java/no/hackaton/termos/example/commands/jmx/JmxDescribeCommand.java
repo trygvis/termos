@@ -5,7 +5,6 @@ import static no.hackaton.termos.extra.formatting.PageUtil.*;
 import no.hackaton.termos.extra.*;
 
 import javax.management.*;
-import java.io.*;
 import java.lang.management.*;
 import java.util.*;
 
@@ -35,7 +34,12 @@ public class JmxDescribeCommand extends SimplePrintingCliCommand implements Comp
     }
 
     @Override
-    public void runWithPrinter(PrintWriter writer) throws Exception {
+    public void run() throws Exception {
+        if(args.length != 1) {
+            error.println("Usage: describe <object name>");
+            return;
+        }
+
         MBeanInfo mBeanInfo = mBeanServer.getMBeanInfo(new ObjectName(args[0]));
 
         MBeanAttributeInfo[] attributes = mBeanInfo.getAttributes();

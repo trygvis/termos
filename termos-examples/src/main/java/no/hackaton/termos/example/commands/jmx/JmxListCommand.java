@@ -3,7 +3,6 @@ package no.hackaton.termos.example.commands.jmx;
 import no.hackaton.termos.extra.*;
 
 import javax.management.*;
-import java.io.*;
 import java.lang.management.*;
 import java.util.*;
 
@@ -23,8 +22,8 @@ public class JmxListCommand extends SimplePrintingCliCommand {
     }
 
     @Override
-    public void runWithPrinter(PrintWriter writer) {
-        Set<ObjectName> names = mBeanServer.queryNames(null, null);
+    public void run() {
+        Set<ObjectName> names = new TreeSet<ObjectName>(mBeanServer.queryNames(null, null));
         writer.println("Showing " + names.size() + " JMX objects:");
         for (ObjectName name : names) {
             writer.println(" " + name.getCanonicalName());

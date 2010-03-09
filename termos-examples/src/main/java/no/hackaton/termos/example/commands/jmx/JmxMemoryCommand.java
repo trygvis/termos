@@ -22,7 +22,7 @@ public class JmxMemoryCommand extends SimplePrintingCliCommand {
     }
 
     @Override
-    public void runWithPrinter(PrintWriter writer) {
+    public void run() {
         writer.println("Memory");
         writer.println(" Heap");
         print(writer, memory.getHeapMemoryUsage());
